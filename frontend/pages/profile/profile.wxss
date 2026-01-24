@@ -1,0 +1,285 @@
+/* pages/profile/profile.wxss */
+.container {
+  padding: 0;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 用户信息区 */
+.user-section {
+  display: flex;
+  align-items: center;
+  padding: 40rpx 30rpx;
+  background: linear-gradient(135deg, #4A90D9 0%, #357ABD 100%);
+  color: #fff;
+}
+
+.avatar-btn {
+  width: 120rpx !important;
+  height: 120rpx !important;
+  min-width: 120rpx !important;
+  min-height: 120rpx !important;
+  max-width: 120rpx !important;
+  max-height: 120rpx !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 60rpx !important;
+  overflow: hidden;
+  border: 4rpx solid rgba(255,255,255,0.5);
+  background: #ccc;
+  line-height: 120rpx;
+  box-sizing: content-box;
+  flex-shrink: 0;
+}
+
+.avatar-btn::after {
+  border: none;
+}
+
+.avatar-wrapper {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4rpx solid rgba(255,255,255,0.5);
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+}
+
+.user-info {
+  margin-left: 30rpx;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.nickname-input {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #fff;
+  background: transparent;
+  border: none;
+  padding: 0;
+  height: 50rpx;
+  line-height: 50rpx;
+}
+
+.nickname-input::placeholder {
+  color: rgba(255,255,255,0.7);
+}
+
+.nickname {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.user-tip {
+  font-size: 26rpx;
+  opacity: 0.8;
+  margin-top: 8rpx;
+}
+
+/* 数据概览 */
+.stats-overview {
+  display: flex;
+  justify-content: space-around;
+  padding: 30rpx 20rpx;
+  background: #fff;
+  margin-bottom: 20rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #4A90D9;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+/* 通用分区 */
+.section {
+  background: #fff;
+  margin-bottom: 20rpx;
+  padding: 30rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+  padding-left: 16rpx;
+  border-left: 6rpx solid #4A90D9;
+}
+
+/* 成就徽章 */
+.badges-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.badge-item {
+  width: calc(33.33% - 14rpx);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx 10rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+}
+
+.badge-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  margin-bottom: 10rpx;
+}
+
+.badge-icon.trophy { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+.badge-icon.star { background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); }
+.badge-icon.medal { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.badge-icon.clock { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+.badge-icon.excellent { background: linear-gradient(135deg, #4A90D9 0%, #357ABD 100%); }
+
+.badge-name {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.badge-desc {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
+
+.empty-badges {
+  padding: 40rpx;
+  text-align: center;
+}
+
+.empty-text {
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 里程碑 */
+.milestone-list {
+  display: flex;
+  justify-content: space-around;
+}
+
+.milestone-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.4;
+}
+
+.milestone-item.achieved {
+  opacity: 1;
+}
+
+.milestone-icon {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.milestone-item.achieved .milestone-icon {
+  background: linear-gradient(135deg, #4A90D9 0%, #357ABD 100%);
+  color: #fff;
+}
+
+.milestone-text {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 菜单 */
+.menu-section {
+  background: #fff;
+  margin-bottom: 20rpx;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.share-btn {
+  width: 100%;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border-radius: 0;
+  font-size: 30rpx;
+  font-weight: normal;
+  line-height: normal;
+  text-align: left;
+  border-bottom: none;
+}
+
+.share-btn::after {
+  border: none;
+}
+
+.share-btn-content {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+}
+
+.menu-text {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.menu-arrow {
+  color: #ccc;
+  font-size: 28rpx;
+}
+
+/* 退出登录 */
+.logout-btn {
+  margin: 40rpx 30rpx;
+  padding: 24rpx;
+  text-align: center;
+  background: #fff;
+  border-radius: 12rpx;
+  color: #ff4d4f;
+  font-size: 30rpx;
+}

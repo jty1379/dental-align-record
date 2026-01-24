@@ -1,0 +1,51 @@
+{
+  "pages": [
+    "pages/timer/timer",
+    "pages/plan/plan",
+    "pages/stats/stats",
+    "pages/profile/profile",
+    "pages/index/index",
+    "pages/logs/logs"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "牙套佩戴记录",
+    "navigationBarBackgroundColor": "#ffffff"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#4A90D9",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/timer/timer",
+        "text": "计时",
+        "iconPath": "images/icon-timer.png",
+        "selectedIconPath": "images/icon-timer-active.png"
+      },
+      {
+        "pagePath": "pages/plan/plan",
+        "text": "计划",
+        "iconPath": "images/icon-plan.png",
+        "selectedIconPath": "images/icon-plan-active.png"
+      },
+      {
+        "pagePath": "pages/stats/stats",
+        "text": "统计",
+        "iconPath": "images/icon-stats.png",
+        "selectedIconPath": "images/icon-stats-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/icon-profile.png",
+        "selectedIconPath": "images/icon-profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

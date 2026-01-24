@@ -1,0 +1,90 @@
+<!--pages/profile/profile.wxml-->
+<view class="container">
+  <!-- 用户信息区 -->
+  <view class="user-section">
+    <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+      <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+    </button>
+    <view class="user-info">
+      <input type="nickname" class="nickname-input" placeholder="点击设置昵称" value="{{userInfo.nickName}}" bindchange="onNicknameInput" bindinput="onNicknameInput" />
+      <text class="user-tip">第 {{currentSet}}/{{totalSets}} 副牙套</text>
+    </view>
+  </view>
+
+  <!-- 数据概览 -->
+  <view class="stats-overview">
+    <view class="stat-item">
+      <text class="stat-value">{{totalDays}}</text>
+      <text class="stat-label">记录天数</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{currentStreak}}</text>
+      <text class="stat-label">连续达标</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{totalHours}}</text>
+      <text class="stat-label">累计小时</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{completionRate}}%</text>
+      <text class="stat-label">达标率</text>
+    </view>
+  </view>
+
+  <!-- 成就徽章 -->
+  <view class="section">
+    <view class="section-title">成就徽章</view>
+    <view class="badges-container" wx:if="{{badges.length > 0}}">
+      <view class="badge-item" wx:for="{{badges}}" wx:key="name">
+        <view class="badge-icon {{item.icon}}"></view>
+        <text class="badge-name">{{item.name}}</text>
+        <text class="badge-desc">{{item.desc}}</text>
+      </view>
+    </view>
+    <view class="empty-badges" wx:else>
+      <text class="empty-text">继续努力，解锁更多成就!</text>
+    </view>
+  </view>
+
+  <!-- 里程碑 -->
+  <view class="section">
+    <view class="section-title">里程碑</view>
+    <view class="milestone-list">
+      <view class="milestone-item {{longestStreak >= 7 ? 'achieved' : ''}}">
+        <view class="milestone-icon">7</view>
+        <text class="milestone-text">连续7天达标</text>
+      </view>
+      <view class="milestone-item {{longestStreak >= 30 ? 'achieved' : ''}}">
+        <view class="milestone-icon">30</view>
+        <text class="milestone-text">连续30天达标</text>
+      </view>
+      <view class="milestone-item {{longestStreak >= 100 ? 'achieved' : ''}}">
+        <view class="milestone-icon">100</view>
+        <text class="milestone-text">连续100天达标</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-section">
+    <view class="menu-item" bindtap="clearCache">
+      <text class="menu-text">清除缓存</text>
+      <text class="menu-arrow">></text>
+    </view>
+    <view class="menu-item" bindtap="showAbout">
+      <text class="menu-text">关于</text>
+      <text class="menu-arrow">></text>
+    </view>
+    <button class="share-btn" open-type="share">
+      <view class="share-btn-content">
+        <text class="menu-text">分享给朋友</text>
+        <text class="menu-arrow">></text>
+      </view>
+    </button>
+  </view>
+
+  <!-- 退出登录 -->
+  <view class="logout-btn" bindtap="logout">
+    <text>退出登录</text>
+  </view>
+</view>

@@ -1,0 +1,93 @@
+<!--pages/plan/plan.wxml-->
+<view class="container">
+  <!-- 进度卡片 -->
+  <view class="progress-card">
+    <view class="progress-header">
+      <text class="progress-title">佩戴进度</text>
+      <text class="progress-subtitle">第 {{currentSet}} 副 / 共 {{totalSets}} 副</text>
+    </view>
+    <view class="progress-bar-wrapper">
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{progressPercent}}%"></view>
+      </view>
+      <text class="progress-percent">{{progressPercent}}%</text>
+    </view>
+    <view class="progress-info">
+      <view class="info-item">
+        <text class="info-value">{{daysWorn}}</text>
+        <text class="info-label">已佩戴天数</text>
+      </view>
+      <view class="info-item">
+        <text class="info-value">{{currentSetDay}}/{{daysPerSet}}</text>
+        <text class="info-label">当前副天数</text>
+      </view>
+      <view class="info-item">
+        <text class="info-value">{{remainingDays}}</text>
+        <text class="info-label">预计剩余天数</text>
+      </view>
+    </view>
+    <button class="next-set-btn" bindtap="onNextSet">
+      切换到下一副
+    </button>
+  </view>
+  
+  <!-- 设置卡片 -->
+  <view class="settings-card">
+    <view class="card-title">佩戴计划设置</view>
+    
+    <view class="setting-item">
+      <text class="setting-label">牙套总副数</text>
+      <picker mode="selector" range="{{totalSetsRange}}" value="{{totalSets - 1}}" bindchange="onTotalSetsChange">
+        <view class="setting-value">{{totalSets}} 副</view>
+      </picker>
+    </view>
+    
+    <view class="setting-item">
+      <text class="setting-label">每副佩戴天数</text>
+      <picker mode="selector" range="{{daysPerSetRange}}" value="{{daysPerSet - 7}}" bindchange="onDaysPerSetChange">
+        <view class="setting-value">{{daysPerSet}} 天</view>
+      </picker>
+    </view>
+    
+    <view class="setting-item">
+      <text class="setting-label">当前第几副</text>
+      <input class="setting-input" type="number" value="{{currentSet}}" bindblur="onCurrentSetChange" />
+    </view>
+    
+    <view class="setting-item">
+      <text class="setting-label">每天目标时长</text>
+      <picker mode="selector" range="{{targetHoursRange}}" value="{{targetHours - 1}}" bindchange="onTargetHoursChange">
+        <view class="setting-value">{{targetHours}} 小时</view>
+      </picker>
+    </view>
+    
+    <view class="setting-item">
+      <text class="setting-label">开始佩戴日期</text>
+      <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+        <view class="setting-value">{{startDate || '请选择'}}</view>
+      </picker>
+    </view>
+  </view>
+  
+  <!-- 夜间时段设置 -->
+  <view class="settings-card">
+    <view class="card-title">夜间理想佩戴时段</view>
+    
+    <view class="setting-item">
+      <text class="setting-label">开始时间</text>
+      <picker mode="time" value="{{nightStartTime}}" bindchange="onNightStartChange">
+        <view class="setting-value">{{nightStartTime}}</view>
+      </picker>
+    </view>
+    
+    <view class="setting-item">
+      <text class="setting-label">结束时间</text>
+      <picker mode="time" value="{{nightEndTime}}" bindchange="onNightEndChange">
+        <view class="setting-value">{{nightEndTime}}</view>
+      </picker>
+    </view>
+  </view>
+  
+  <!-- 保存按钮 -->
+  <button class="save-btn" bindtap="savePlan">同步到云端</button>
+</view>

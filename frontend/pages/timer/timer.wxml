@@ -1,0 +1,43 @@
+<!--pages/timer/timer.wxml-->
+<view class="container">
+  <!-- 成就徽章 -->
+  <view class="achievement-badge" wx:if="{{currentStreak > 0}}">
+    <text class="badge-icon">🏆</text>
+    <text class="badge-text">连续完成 {{currentStreak}} 天</text>
+  </view>
+  
+  <!-- 时间显示 -->
+  <view class="time-display">
+    <text class="time-label">今日已佩戴</text>
+    <text class="time-value">{{displayTime}}</text>
+    <text class="time-target">目标: {{targetSeconds / 3600}}小时</text>
+  </view>
+  
+  <!-- 进度环 -->
+  <view class="progress-wrapper">
+    <view class="progress-ring">
+      <view class="progress-bg"></view>
+      <view class="progress-fill" style="--percent: {{progressPercent}}"></view>
+      <view class="progress-center">
+        <text class="progress-percent">{{progressPercent}}%</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 主按钮 -->
+  <view class="main-button-wrapper">
+    <button 
+      class="main-button {{isWearing ? 'active' : ''}}" 
+      bindtap="onToggleTimer"
+      disabled="{{loading}}"
+    >
+      <text class="button-text">{{isWearing ? '停止佩戴' : '开始佩戴'}}</text>
+    </button>
+    <text class="status-text">{{statusText}}</text>
+  </view>
+  
+  <!-- 提示信息 -->
+  <view class="tips" wx:if="{{!isWearing && progressPercent < 100}}">
+    <text class="tips-text">💡 退出小程序后计时仍会继续</text>
+  </view>
+</view>

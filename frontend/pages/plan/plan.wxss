@@ -1,0 +1,168 @@
+/* pages/plan/plan.wxss */
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+/* 进度卡片 */
+.progress-card {
+  background: linear-gradient(135deg, #4A90D9 0%, #357ABD 100%);
+  border-radius: 24rpx;
+  padding: 40rpx;
+  margin-bottom: 24rpx;
+  color: #ffffff;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.progress-title {
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+.progress-subtitle {
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+.progress-bar-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 16rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 8rpx;
+  overflow: hidden;
+  margin-right: 20rpx;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #ffffff;
+  border-radius: 8rpx;
+  transition: width 0.3s ease;
+}
+
+.progress-percent {
+  font-size: 28rpx;
+  font-weight: 600;
+  min-width: 80rpx;
+  text-align: right;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 32rpx;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.info-value {
+  font-size: 40rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.info-label {
+  font-size: 24rpx;
+  opacity: 0.8;
+}
+
+.next-set-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 28rpx;
+  padding: 20rpx 0;
+  border-radius: 12rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.5);
+}
+
+.next-set-btn::after {
+  border: none;
+}
+
+/* 设置卡片 */
+.settings-card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 24rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-label {
+  font-size: 30rpx;
+  color: #333333;
+}
+
+.setting-value {
+  font-size: 30rpx;
+  color: #4A90D9;
+  display: flex;
+  align-items: center;
+}
+
+.setting-value::after {
+  content: '›';
+  margin-left: 8rpx;
+  color: #cccccc;
+}
+
+.setting-input {
+  width: 120rpx;
+  text-align: right;
+  font-size: 30rpx;
+  color: #4A90D9;
+}
+
+/* 保存按钮 */
+.save-btn {
+  background: linear-gradient(135deg, #4A90D9 0%, #357ABD 100%);
+  color: #ffffff;
+  font-size: 32rpx;
+  font-weight: 600;
+  padding: 28rpx 0;
+  border-radius: 16rpx;
+  margin-top: 20rpx;
+  margin-bottom: 40rpx;
+}
+
+.save-btn::after {
+  border: none;
+}

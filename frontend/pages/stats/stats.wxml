@@ -1,0 +1,92 @@
+<!--pages/stats/stats.wxml-->
+<view class="container">
+  <!-- 周选择器 -->
+  <view class="week-selector">
+    <view class="week-btn" bindtap="onPrevWeek">
+      <text class="arrow">‹</text>
+    </view>
+    <text class="week-label">{{weekLabel}}</text>
+    <view class="week-btn {{weekOffset >= 0 ? 'disabled' : ''}}" bindtap="onNextWeek">
+      <text class="arrow">›</text>
+    </view>
+  </view>
+  
+  <!-- 图表区域 -->
+  <view class="chart-card">
+    <view class="chart-title">佩戴时长统计</view>
+    <view class="chart-container">
+      <!-- 简易柱状图 -->
+      <view class="bars-wrapper">
+        <view class="bar-item" wx:for="{{weekData}}" wx:key="date">
+          <view class="bar-wrapper">
+            <view 
+              class="bar {{item.completed ? 'completed' : ''}}" 
+              style="height: {{item.hours / targetHours * 100}}%"
+            ></view>
+          </view>
+          <text class="bar-label">{{item.dayLabel}}</text>
+          <text class="bar-value">{{item.hours}}h</text>
+        </view>
+      </view>
+      <!-- 目标线 -->
+      <view class="target-line">
+        <text class="target-text">目标 {{targetHours}}h</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 统计卡片 -->
+  <view class="stats-row">
+    <view class="stat-card">
+      <text class="stat-value">{{avgHours}}</text>
+      <text class="stat-unit">小时</text>
+      <text class="stat-label">日均佩戴</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value">{{completionRate}}</text>
+      <text class="stat-unit">%</text>
+      <text class="stat-label">本周完成率</text>
+    </view>
+    <view class="stat-card highlight">
+      <text class="stat-value">{{currentStreak}}</text>
+      <text class="stat-unit">天</text>
+      <text class="stat-label">连续达标</text>
+    </view>
+  </view>
+  
+  <!-- 成就卡片 -->
+  <view class="achievement-card">
+    <view class="achievement-header">
+      <text class="achievement-title">🏆 成就</text>
+    </view>
+    <view class="achievement-row">
+      <view class="achievement-item">
+        <text class="ach-value">{{longestStreak}}</text>
+        <text class="ach-label">最长连续天数</text>
+      </view>
+      <view class="achievement-item">
+        <text class="ach-value">{{totalCompletedDays}}</text>
+        <text class="ach-label">总达标天数</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 建议卡片 -->
+  <view class="suggestion-card" wx:if="{{suggestions.length > 0}}">
+    <view class="suggestion-header">
+      <text class="suggestion-icon">💡</text>
+      <text class="suggestion-title">智能建议</text>
+    </view>
+    <view class="suggestion-list">
+      <view class="suggestion-item" wx:for="{{suggestions}}" wx:key="index">
+        <text>{{item}}</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 分享按钮 -->
+  <button class="share-btn" bindtap="onShareReport">
+    <text class="share-icon">📤</text>
+    <text>分享周报到朋友圈</text>
+  </button>
+</view>
