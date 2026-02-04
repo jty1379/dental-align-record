@@ -57,11 +57,11 @@ function login(code) {
   return request('/auth/login', 'POST', { code })
 }
 
-// 计时相关API
+// 计时相关API（时间由服务器决定）
 const timer = {
   getStatus: () => request('/timer/status'),
-  start: (startTime) => request('/timer/start', 'POST', { start_time: startTime }),
-  stop: (sessionId, endTime) => request('/timer/stop', 'POST', { session_id: sessionId, end_time: endTime })
+  start: () => request('/timer/start', 'POST', {}),  // 不传时间，由服务器生成
+  stop: (sessionId) => request('/timer/stop', 'POST', { session_id: sessionId })  // 不传时间
 }
 
 // 计划相关API

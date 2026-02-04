@@ -5,17 +5,21 @@ Page({
   data: {
     isWearing: false,
     sessionId: null,
-    startTime: null,
-    todayTotal: 0,        // 今日累计秒数
-    targetSeconds: 79200, // 目标秒数 (22小时)
+    startTime: null,       // 服务器返回的开始时间
+    serverTimeOffset: 0,   // 本地时间与服务器时间的偏移量（毫秒）
+    todayTotal: 0,         // 今日累计秒数（已完成的会话）
+    targetSeconds: 79200,  // 目标秒数 (22小时)
     displayTime: '00:00:00',
     progressPercent: 0,
     currentStreak: 0,
     statusText: '点击开始佩戴',
-    loading: true
+    loading: true,
+    offline: false,        // 是否离线模式
+    lastSyncTime: null     // 上次同步时间
   },
 
   timer: null,
+  syncTimer: null,  // 定期同步定时器
 
   onLoad() {
     this.checkLoginAndLoadStatus()
@@ -33,6 +37,7 @@ Page({
 
   onUnload() {
     this.stopDisplayTimer()
+    this.stopSyncTimer()
   },
 
   // 检查登录状态并加载数据
@@ -74,79 +79,68 @@ Page({
     }
   },
 
-  // 加载计时状态
+  // 加载计时状态（从服务器）
   async loadTimerStatus() {
     try {
       const status = await api.timer.getStatus()
+      
+      // 计算服务器时间与本地时间的偏移
+      const serverTime = new Date(status.server_time)
+      const localTime = new Date()
+      const offset = serverTime.getTime() - localTime.getTime()
       
       this.setData({
         isWearing: status.is_wearing,
         sessionId: status.session_id,
         startTime: status.start_time ? new Date(status.start_time) : null,
+        serverTimeOffset: offset,
         todayTotal: status.today_total,
         targetSeconds: status.target_seconds,
-        statusText: status.is_wearing ? '佩戴中，点击停止' : '点击开始佩戴'
+        statusText: status.is_wearing ? '佩戴中，点击停止' : '点击开始佩戴',
+        offline: false,
+        lastSyncTime: new Date()
       })
+      
+      // 保存到本地缓存（仅作为显示备份）
+      this.saveLocalCache()
       
       this.updateDisplay()
       
       if (status.is_wearing) {
         this.startDisplayTimer()
+        this.startSyncTimer()  // 计时中定期同步
+      } else {
+        this.stopSyncTimer()
       }
     } catch (err) {
       console.error('加载状态失败:', err)
-      // 如果API失败，使用本地数据
-      this.loadLocalStatus()
+      this.handleOfflineMode()
     }
   },
 
-  // 加载本地状态（离线模式）
-  loadLocalStatus() {
-    const localState = wx.getStorageSync('timer_state') || {}
-    const today = this.getTodayDate()
-    
-    // 检查是否跨日
-    if (localState.lastUpdateDate && localState.lastUpdateDate !== today) {
-      // 归档昨日数据
-      this.archiveYesterdayData(localState)
-      localState.todayTotal = 0
-      localState.lastUpdateDate = today
-    }
+  // 处理离线模式
+  handleOfflineMode() {
+    const cache = wx.getStorageSync('timer_cache') || {}
     
     this.setData({
-      isWearing: localState.isWearing || false,
-      startTime: localState.startTime ? new Date(localState.startTime) : null,
-      todayTotal: localState.todayTotal || 0,
-      statusText: localState.isWearing ? '佩戴中，点击停止' : '点击开始佩戴'
+      offline: true,
+      isWearing: cache.isWearing || false,
+      startTime: cache.startTime ? new Date(cache.startTime) : null,
+      todayTotal: cache.todayTotal || 0,
+      statusText: cache.isWearing ? '佩戴中（离线）' : '服务器连接失败'
     })
     
     this.updateDisplay()
     
-    if (localState.isWearing) {
+    if (cache.isWearing) {
       this.startDisplayTimer()
     }
-  },
-
-  // 归档昨日数据
-  archiveYesterdayData(state) {
-    if (!state.lastUpdateDate) return
     
-    const records = wx.getStorageSync('daily_records') || []
-    const existingIndex = records.findIndex(r => r.date === state.lastUpdateDate)
-    
-    const record = {
-      date: state.lastUpdateDate,
-      totalSeconds: state.todayTotal || 0,
-      completed: (state.todayTotal || 0) >= this.data.targetSeconds
-    }
-    
-    if (existingIndex >= 0) {
-      records[existingIndex] = record
-    } else {
-      records.push(record)
-    }
-    
-    wx.setStorageSync('daily_records', records)
+    wx.showToast({
+      title: '无法连接服务器',
+      icon: 'none',
+      duration: 2000
+    })
   },
 
   // 加载成就数据
@@ -165,6 +159,18 @@ Page({
   async onToggleTimer() {
     if (this.data.loading) return
     
+    // 离线模式下禁止操作
+    if (this.data.offline) {
+      wx.showModal({
+        title: '无法操作',
+        content: '当前处于离线模式，请检查网络连接后重试',
+        showCancel: false
+      })
+      // 尝试重新连接
+      this.loadTimerStatus()
+      return
+    }
+    
     if (this.data.isWearing) {
       await this.stopTimer()
     } else {
@@ -172,85 +178,126 @@ Page({
     }
   },
 
-  // 开始计时
+  // 开始计时（时间由服务器决定）
   async startTimer() {
-    const startTime = new Date()
-    
     try {
-      const result = await api.timer.start(startTime.toISOString())
+      wx.showLoading({ title: '开始计时...' })
+      
+      const result = await api.timer.start()
+      
+      wx.hideLoading()
+      
+      // 使用服务器返回的时间
+      const serverStartTime = new Date(result.start_time)
+      const serverTime = new Date(result.server_time)
+      const localTime = new Date()
+      const offset = serverTime.getTime() - localTime.getTime()
       
       this.setData({
         isWearing: true,
         sessionId: result.session_id,
-        startTime: startTime,
-        statusText: '佩戴中，点击停止'
+        startTime: serverStartTime,
+        serverTimeOffset: offset,
+        statusText: '佩戴中，点击停止',
+        offline: false
       })
       
       this.startDisplayTimer()
-      
-      // 保存本地状态
-      this.saveLocalState()
+      this.startSyncTimer()
+      this.saveLocalCache()
       
       wx.showToast({
         title: '开始计时',
         icon: 'success'
       })
     } catch (err) {
+      wx.hideLoading()
       console.error('开始计时失败:', err)
-      // 离线模式：直接本地计时
-      this.setData({
-        isWearing: true,
-        startTime: startTime,
-        statusText: '佩戴中，点击停止'
+      
+      let message = '开始计时失败'
+      if (err.message && err.message.includes('已有进行中')) {
+        message = '已有进行中的计时'
+        // 重新同步状态
+        this.loadTimerStatus()
+      }
+      
+      wx.showToast({
+        title: message,
+        icon: 'none'
       })
-      this.startDisplayTimer()
-      this.saveLocalState()
     }
   },
 
-  // 停止计时
+  // 停止计时（时间由服务器决定）
   async stopTimer() {
-    const endTime = new Date()
-    
-    this.stopDisplayTimer()
-    
-    // 计算本次时长
-    const duration = Math.floor((endTime - this.data.startTime) / 1000)
-    const newTotal = this.data.todayTotal + duration
-    
-    try {
-      if (this.data.sessionId) {
-        await api.timer.stop(this.data.sessionId, endTime.toISOString())
-      }
-    } catch (err) {
-      console.error('停止计时API失败:', err)
-    }
-    
-    this.setData({
-      isWearing: false,
-      sessionId: null,
-      startTime: null,
-      todayTotal: newTotal,
-      statusText: '点击开始佩戴'
-    })
-    
-    this.updateDisplay()
-    this.saveLocalState()
-    
-    // 检查是否达标
-    if (newTotal >= this.data.targetSeconds) {
+    if (!this.data.sessionId) {
       wx.showToast({
-        title: '今日目标已达成！',
-        icon: 'success'
-      })
-    } else {
-      const remaining = this.data.targetSeconds - newTotal
-      const hours = Math.floor(remaining / 3600)
-      const mins = Math.floor((remaining % 3600) / 60)
-      wx.showToast({
-        title: `还需佩戴${hours}小时${mins}分钟`,
+        title: '无有效会话',
         icon: 'none'
       })
+      return
+    }
+    
+    try {
+      wx.showLoading({ title: '停止计时...' })
+      
+      this.stopDisplayTimer()
+      this.stopSyncTimer()
+      
+      const result = await api.timer.stop(this.data.sessionId)
+      
+      wx.hideLoading()
+      
+      // 使用服务器返回的数据
+      this.setData({
+        isWearing: false,
+        sessionId: null,
+        startTime: null,
+        todayTotal: result.today_total,
+        statusText: '点击开始佩戴'
+      })
+      
+      this.updateDisplay()
+      this.saveLocalCache()
+      
+      // 显示结果
+      if (result.completed) {
+        wx.showToast({
+          title: '今日目标已达成！',
+          icon: 'success'
+        })
+      } else {
+        const remaining = this.data.targetSeconds - result.today_total
+        const hours = Math.floor(remaining / 3600)
+        const mins = Math.floor((remaining % 3600) / 60)
+        wx.showToast({
+          title: `本次${Math.floor(result.duration / 60)}分钟，还需${hours}时${mins}分`,
+          icon: 'none',
+          duration: 3000
+        })
+      }
+    } catch (err) {
+      wx.hideLoading()
+      console.error('停止计时失败:', err)
+      
+      // 如果是超时错误，说明会话已被服务器自动关闭
+      if (err.message && err.message.includes('超过')) {
+        wx.showModal({
+          title: '计时异常',
+          content: err.message,
+          showCancel: false
+        })
+        this.loadTimerStatus()  // 重新同步
+        return
+      }
+      
+      wx.showToast({
+        title: '停止失败，请重试',
+        icon: 'none'
+      })
+      
+      // 恢复计时显示
+      this.startDisplayTimer()
     }
   },
 
@@ -270,14 +317,64 @@ Page({
     }
   },
 
-  // 更新显示
+  // 启动定期同步定时器（每30秒同步一次）
+  startSyncTimer() {
+    this.stopSyncTimer()
+    this.syncTimer = setInterval(() => {
+      this.syncWithServer()
+    }, 30000)
+  },
+
+  // 停止同步定时器
+  stopSyncTimer() {
+    if (this.syncTimer) {
+      clearInterval(this.syncTimer)
+      this.syncTimer = null
+    }
+  },
+
+  // 与服务器同步状态
+  async syncWithServer() {
+    try {
+      const status = await api.timer.getStatus()
+      
+      // 更新服务器时间偏移
+      const serverTime = new Date(status.server_time)
+      const localTime = new Date()
+      const offset = serverTime.getTime() - localTime.getTime()
+      
+      this.setData({
+        serverTimeOffset: offset,
+        todayTotal: status.today_total,
+        lastSyncTime: new Date()
+      })
+      
+      // 检查服务器状态与本地是否一致
+      if (status.is_wearing !== this.data.isWearing) {
+        console.warn('状态不一致，重新同步')
+        this.loadTimerStatus()
+      }
+      
+      this.saveLocalCache()
+    } catch (err) {
+      console.error('同步失败:', err)
+    }
+  },
+
+  // 更新显示（使用校准后的时间）
   updateDisplay() {
     let totalSeconds = this.data.todayTotal
     
-    // 如果正在计时，加上当前进行的时长
+    // 如果正在计时，计算当前进行的时长
     if (this.data.isWearing && this.data.startTime) {
-      const currentDuration = Math.floor((new Date() - this.data.startTime) / 1000)
-      totalSeconds += currentDuration
+      // 使用校准后的当前时间
+      const calibratedNow = new Date(Date.now() + this.data.serverTimeOffset)
+      const currentDuration = Math.floor((calibratedNow - this.data.startTime) / 1000)
+      
+      // 防止负数（时钟误差）
+      if (currentDuration > 0) {
+        totalSeconds += currentDuration
+      }
     }
     
     // 格式化时间显示
@@ -307,14 +404,18 @@ Page({
     return `${now.getFullYear()}-${this.padZero(now.getMonth() + 1)}-${this.padZero(now.getDate())}`
   },
 
-  // 保存本地状态
-  saveLocalState() {
-    const state = {
+  // 保存本地缓存（仅作为显示备份）
+  saveLocalCache() {
+    const cache = {
       isWearing: this.data.isWearing,
+      sessionId: this.data.sessionId,
       startTime: this.data.startTime ? this.data.startTime.toISOString() : null,
       todayTotal: this.data.todayTotal,
-      lastUpdateDate: this.getTodayDate()
+      targetSeconds: this.data.targetSeconds,
+      serverTimeOffset: this.data.serverTimeOffset,
+      lastUpdateDate: this.getTodayDate(),
+      lastSyncTime: new Date().toISOString()
     }
-    wx.setStorageSync('timer_state', state)
+    wx.setStorageSync('timer_cache', cache)
   }
 })

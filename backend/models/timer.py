@@ -22,3 +22,4 @@ class TimerStatusResponse(BaseModel):
     start_time: Optional[datetime] = None
     today_total: int = 0  # 今日累计秒数
     target_seconds: int = 79200  # 目标秒数 (22小时)
+    server_time: Optional[datetime] = None  # 服务器时间，用于前端校准
